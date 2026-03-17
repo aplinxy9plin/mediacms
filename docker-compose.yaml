@@ -44,8 +44,6 @@ services:
 
   web:
     image: 'mediacms/mediacms:latest'
-    ports:
-      - '${WEB_PORT:-80}:80'
     volumes:
       - 'media_store:/home/mediacms.io/mediacms/media_files/'
       - 'static_store:/home/mediacms.io/mediacms/static/'
