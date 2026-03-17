@@ -3,16 +3,18 @@ import os
 FRONTEND_HOST = os.getenv('FRONTEND_HOST', 'http://localhost')
 PORTAL_NAME = os.getenv('PORTAL_NAME', 'MediaCMS')
 SECRET_KEY = os.getenv('SECRET_KEY', 'ma!s3^b-cw!f#7s6s0m3*jx77a@riw(7701**(r=ww%w!2+yk2')
-REDIS_LOCATION = os.getenv('REDIS_LOCATION', 'redis://redis:6379/1')
+REDIS_HOST = os.getenv('REDIS_HOST', 'redis')
+REDIS_PORT = os.getenv('REDIS_PORT', '6379')
+REDIS_LOCATION = os.getenv('REDIS_LOCATION', f'redis://{REDIS_HOST}:{REDIS_PORT}/1')
 
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv('POSTGRES_NAME', 'mediacms'),
-        "HOST": os.getenv('POSTGRES_HOST', 'db'),
-        "PORT": os.getenv('POSTGRES_PORT', '5432'),
-        "USER": os.getenv('POSTGRES_USER', 'mediacms'),
-        "PASSWORD": os.getenv('POSTGRES_PASSWORD', 'mediacms'),
+        "NAME": os.getenv('POSTGRES_DB', os.getenv('POSTGRES_NAME', 'mediacms')),
+        "HOST": os.getenv('DATABASE_HOST', os.getenv('POSTGRES_HOST', 'db')),
+        "PORT": os.getenv('DATABASE_PORT', os.getenv('POSTGRES_PORT', '5432')),
+        "USER": os.getenv('DATABASE_USER', os.getenv('POSTGRES_USER', 'mediacms')),
+        "PASSWORD": os.getenv('DATABASE_PASSWORD', os.getenv('POSTGRES_PASSWORD', 'mediacms')),
         "OPTIONS": {'pool': True},
     }
 }

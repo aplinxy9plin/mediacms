@@ -2,7 +2,6 @@ version: '3'
 services:
   migrations:
     image: 'mediacms/mediacms:latest'
-    container_name: mediacms_migrations
     volumes:
       - 'media_store:/home/mediacms.io/mediacms/media_files/'
       - 'static_store:/home/mediacms.io/mediacms/static/'
@@ -15,6 +14,7 @@ services:
       ADMIN_USER: ${ADMIN_USER:-admin}
       ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@example.com}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-changeme_admin_password}
+      POSTGRES_DB: ${POSTGRES_DB:-mediacms}
       DATABASE_HOST: db
       DATABASE_PORT: 5432
       DATABASE_USER: ${POSTGRES_USER:-mediacms}
@@ -31,7 +31,6 @@ services:
         condition: service_healthy
   web:
     image: 'mediacms/mediacms:latest'
-    container_name: mediacms_web
     volumes:
       - 'media_store:/home/mediacms.io/mediacms/media_files/'
       - 'static_store:/home/mediacms.io/mediacms/static/'
@@ -42,6 +41,10 @@ services:
       ENABLE_MIGRATIONS: 'no'
       ENABLE_NGINX: 'yes'
       ENABLE_UWSGI: 'yes'
+      FRONTEND_HOST: ${FRONTEND_HOST:-http://localhost}
+      PORTAL_NAME: ${PORTAL_NAME:-MediaCMS}
+      SECRET_KEY: ${SECRET_KEY:-change-me}
+      POSTGRES_DB: ${POSTGRES_DB:-mediacms}
       DATABASE_HOST: db
       DATABASE_PORT: 5432
       DATABASE_USER: ${POSTGRES_USER:-mediacms}
@@ -54,7 +57,6 @@ services:
       - migrations
   celery_beat:
     image: 'mediacms/mediacms:latest'
-    container_name: mediacms_celery_beat
     volumes:
       - 'media_store:/home/mediacms.io/mediacms/media_files/'
       - 'static_store:/home/mediacms.io/mediacms/static/'
@@ -65,6 +67,8 @@ services:
       ENABLE_CELERY_LONG: 'no'
       ENABLE_CELERY_BEAT: 'yes'
       ENABLE_MIGRATIONS: 'no'
+      SECRET_KEY: ${SECRET_KEY:-change-me}
+      POSTGRES_DB: ${POSTGRES_DB:-mediacms}
       DATABASE_HOST: db
       DATABASE_PORT: 5432
       DATABASE_USER: ${POSTGRES_USER:-mediacms}
@@ -78,7 +82,6 @@ services:
       - migrations
   celery_worker_short:
     image: 'mediacms/mediacms:latest'
-    container_name: mediacms_worker_short
     volumes:
       - 'media_store:/home/mediacms.io/mediacms/media_files/'
       - 'static_store:/home/mediacms.io/mediacms/static/'
@@ -89,6 +92,8 @@ services:
       ENABLE_CELERY_SHORT: 'yes'
       ENABLE_CELERY_LONG: 'no'
       ENABLE_MIGRATIONS: 'no'
+      SECRET_KEY: ${SECRET_KEY:-change-me}
+      POSTGRES_DB: ${POSTGRES_DB:-mediacms}
       DATABASE_HOST: db
       DATABASE_PORT: 5432
       DATABASE_USER: ${POSTGRES_USER:-mediacms}
@@ -101,7 +106,6 @@ services:
       - migrations
   celery_worker_long:
     image: 'mediacms/mediacms:latest'
-    container_name: mediacms_worker_long
     volumes:
       - 'media_store:/home/mediacms.io/mediacms/media_files/'
       - 'static_store:/home/mediacms.io/mediacms/static/'
@@ -112,6 +116,8 @@ services:
       ENABLE_CELERY_SHORT: 'no'
       ENABLE_CELERY_LONG: 'yes'
       ENABLE_MIGRATIONS: 'no'
+      SECRET_KEY: ${SECRET_KEY:-change-me}
+      POSTGRES_DB: ${POSTGRES_DB:-mediacms}
       DATABASE_HOST: db
       DATABASE_PORT: 5432
       DATABASE_USER: ${POSTGRES_USER:-mediacms}
@@ -124,7 +130,6 @@ services:
       - migrations
   db:
     image: 'postgres:14-alpine'
-    container_name: mediacms_db
     volumes:
       - 'mediacms_pg14_data:/var/lib/postgresql/data/'
     restart: always
@@ -136,13 +141,12 @@ services:
     healthcheck:
       test:
         - CMD-SHELL
-        - 'pg_isready -U ${POSTGRES_USER:-mediacms}'
+        - 'pg_isready -U $$POSTGRES_USER'
       interval: 10s
       timeout: 5s
       retries: 5
   redis:
     image: 'redis:alpine'
-    container_name: mediacms_redis
     restart: always
     healthcheck:
       test:
