@@ -32,8 +32,6 @@ services:
   web:
     image: 'mediacms/mediacms:latest'
     container_name: mediacms_web
-    ports:
-      - '${WEB_PORT:-8082}:80'
     volumes:
       - 'media_store:/home/mediacms.io/mediacms/media_files/'
       - 'static_store:/home/mediacms.io/mediacms/static/'
